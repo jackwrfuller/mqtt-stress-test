@@ -9,9 +9,7 @@ def connect_mqtt(name: str) -> mqtt_client:
             print(name, ": Connected to MQTT Broker!")
         else:
             print("Failed to connect, return code %d\n", reason_code)
-
     client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
-    # client.username_pw_set(username, password)
     client.on_connect = on_connect
     client.connect(host, port)
     return client

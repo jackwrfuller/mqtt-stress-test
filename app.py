@@ -7,13 +7,10 @@ publisher_threads = list()
 
 def run():
     launch_publishers(number=5)
-    time.sleep(5)
     analyser = Analyser()
-    analyser.start(1, 200, 5)
-    # stop_publishers()
+    analyser.start(1, 500, 5)
     
     
-
 def launch_publishers(number: int):
         for thread_index in range(number):
             thread = threading.Thread(target=publisher_loop, args=(thread_index,))
@@ -29,9 +26,6 @@ def publisher_loop(number: int):
         client.reset()
         client.subscribe()
         
-# def stop_publishers():
-#     for thread in publisher_threads:
-#         thread.stop()
 
 if __name__ == '__main__':
     run()

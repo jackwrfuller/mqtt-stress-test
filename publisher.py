@@ -1,5 +1,5 @@
 from paho.mqtt import client as mqtt_client
-import time
+from time import sleep, time
 from client import connect_mqtt
 
 class Publisher:
@@ -35,20 +35,21 @@ class Publisher:
 
         self.client.loop_start()
         while (self.qos is None) or (self.delay is None) or (self.instance_count is None):
-            time.sleep(0.1)
+            sleep(0.1)
         self.client.loop_stop()
         print(self.name, ": config set")
 
     def publish(self):
         topic = f"counter/`{self.name}`/`{self.qos}`/`{self.delay}`"
 
-        time_end = time.time() + 60
+        time_end = time() + 60
         counter = 0
         print(self.name, ": beginning stress test")
-        while time.time() < time_end:
+        while time() < time_end:
+            print(self.name, ": publishing...")
             self.client.publish(topic, payload=counter, qos=self.qos)
             counter += 1
-            time.sleep(self.delay / 1000)
+            sleep(self.delay / 1000)
         print(self.name, ": end stress test")
         
     def reset(self):
