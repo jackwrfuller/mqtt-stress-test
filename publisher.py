@@ -2,6 +2,8 @@ from paho.mqtt import client as mqtt_client
 from time import sleep, time
 from client import connect_mqtt
 
+TEST_TIME = 5
+
 class Publisher:
 
     topics = ["request/qos", "request/delay", "request/instancecount"]
@@ -43,20 +45,19 @@ class Publisher:
     def publish(self):
         topic = f"counter/`{self.name}`/`{self.qos}`/`{self.delay}`"
 
-
-        
-        time_end = time() + 60
+        time_end = time() + TEST_TIME
         counter = 0
         print(self.name, ": beginning stress test")
         while time() < time_end:
             if self.id > self.instance_count:
                 print(self.name, ": not needed")
-                sleep(59)
+                sleep(TEST_TIME)
             print(self.name, ": publishing...")
             self.client.publish(topic, payload=counter, qos=self.qos)
             counter += 1
             sleep(self.delay / 1000)
         print(self.name, ": end stress test")
+        return
         
     def reset(self):
         self.qos = None
