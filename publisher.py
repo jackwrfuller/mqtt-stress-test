@@ -6,13 +6,14 @@ class Publisher:
 
     topics = ["request/qos", "request/delay", "request/instancecount"]
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, id: int):
+        self.id = id
+        self.name = "pub-" + str(id)
         self.qos = None
         self.delay = None
         self.instance_count = None
         # Connect to MQTT brokers
-        self.client = connect_mqtt(name)
+        self.client = connect_mqtt(self.name)
 
 
     def subscribe(self):
@@ -26,7 +27,7 @@ class Publisher:
                 self.delay = int(msg.payload.decode())
             if msg.topic == "request/instancecount":
                 print(self.name, ": setting instance count")
-                self.instance_count = msg.payload.decode()
+                self.instance_count = int(msg.payload.decode())
 
         for topic in self.topics:
             print(self.name, ": subscribing to ", topic)
@@ -42,10 +43,15 @@ class Publisher:
     def publish(self):
         topic = f"counter/`{self.name}`/`{self.qos}`/`{self.delay}`"
 
+
+        
         time_end = time() + 60
         counter = 0
         print(self.name, ": beginning stress test")
         while time() < time_end:
+            if self.id > self.instance_count:
+                print(self.name, ": not needed")
+                sleep(59)
             print(self.name, ": publishing...")
             self.client.publish(topic, payload=counter, qos=self.qos)
             counter += 1
