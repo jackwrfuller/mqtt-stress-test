@@ -61,3 +61,6 @@ class Publisher:
         self.qos = None
         self.delay = None
         self.instance_count = None
+
+    def disconnect(self):
+        self.client.disconnect()
