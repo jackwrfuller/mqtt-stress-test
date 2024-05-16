@@ -2,8 +2,10 @@ from paho.mqtt import client as mqtt_client
 from time import sleep, time
 from client import connect_mqtt
 
-class Publisher:
+TEST_TIME = 5
 
+
+class Publisher:
     topics = ["request/qos", "request/delay", "request/instancecount"]
 
     def __init__(self, id: int):
@@ -15,15 +17,14 @@ class Publisher:
         # Connect to MQTT brokers
         self.client = connect_mqtt(self.name)
 
-
     def subscribe(self):
         def on_message(client, userdata, msg):
             print(self.name, f": received `{msg.payload.decode()}` from `{msg.topic}` topic")
             if msg.topic == "request/qos":
-                print(self.name,": setting QOS")
+                print(self.name, ": setting QOS")
                 self.qos = int(msg.payload.decode())
             if msg.topic == "request/delay":
-                print(self.name,": setting delay")
+                print(self.name, ": setting delay")
                 self.delay = int(msg.payload.decode())
             if msg.topic == "request/instancecount":
                 print(self.name, ": setting instance count")
@@ -41,26 +42,22 @@ class Publisher:
         print(self.name, ": config set")
 
     def publish(self):
-        topic = f"counter/`{self.name}`/`{self.qos}`/`{self.delay}`"
+        topic = f"counter/{self.name}/{self.qos}/{self.delay}"
 
-
-        
-        time_end = time() + 60
+        time_end = time() + TEST_TIME
         counter = 0
         print(self.name, ": beginning stress test")
         while time() < time_end:
             if self.id > self.instance_count:
                 print(self.name, ": not needed")
-                sleep(59)
+                sleep(TEST_TIME)
             print(self.name, ": publishing...")
             self.client.publish(topic, payload=counter, qos=self.qos)
             counter += 1
             sleep(self.delay / 1000)
         print(self.name, ": end stress test")
-        
+
     def reset(self):
         self.qos = None
         self.delay = None
         self.instance_count = None
-
-
