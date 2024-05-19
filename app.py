@@ -8,10 +8,11 @@ import csv
 publisher_threads = list()
 
 
+
 def run():
     results = open("test.csv", 'w', newline='')
     writer = csv.writer(results)
-    fields = ["topic", "time", "value"]
+    fields = ["qos", "delay", "instancecount", "avg_msg", "loss_rate", "out_of_order_rate", "median_gap_1", "median_gap_2", "median_gap_3", "median_gap_4", "median_gap_5", ]
     writer.writerow(fields)
 
     for qos in range(3):
@@ -21,12 +22,13 @@ def run():
                 listener = Listener(writer)
                 launch_publishers(number=5)
                 analyser.start(qos, delay, instancecount)
-                listener.listen(qos, delay)
+                listener.listen(qos, delay, instancecount)
                 for thread in publisher_threads:
                     thread.join()
                 listener.stop()
                 analyser.client.disconnect()
-                listener.client.disconnet()
+                listener.client.disconnect()
+                stats = listener.get_stats()
 
     results.close()
     print(f"Listener counted {listener.count}")
