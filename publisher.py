@@ -21,17 +21,17 @@ class Publisher:
         def on_message(client, userdata, msg):
             print(self.name, f": received `{msg.payload.decode()}` from `{msg.topic}` topic")
             if msg.topic == "request/qos":
-                print(self.name, ": setting QOS")
+                #print(self.name, ": setting QOS")
                 self.qos = int(msg.payload.decode())
             if msg.topic == "request/delay":
-                print(self.name, ": setting delay")
+                #print(self.name, ": setting delay")
                 self.delay = int(msg.payload.decode())
             if msg.topic == "request/instancecount":
-                print(self.name, ": setting instance count")
+                #print(self.name, ": setting instance count")
                 self.instance_count = int(msg.payload.decode())
 
         for topic in self.topics:
-            print(self.name, ": subscribing to ", topic)
+            #print(self.name, ": subscribing to ", topic)
             self.client.subscribe(topic)
         self.client.on_message = on_message
 
@@ -39,9 +39,10 @@ class Publisher:
         while (self.qos is None) or (self.delay is None) or (self.instance_count is None):
             sleep(0.1)
         self.client.loop_stop()
-        print(self.name, ": config set")
+        #print(self.name, ": config set")
 
     def publish(self):
+        self.client.loop_start()
         topic = f"counter/{self.name}/{self.qos}/{self.delay}"
 
         time_end = time() + TEST_TIME
@@ -51,7 +52,7 @@ class Publisher:
             if self.id > self.instance_count:
                 print(self.name, ": not needed")
                 sleep(TEST_TIME)
-            print(self.name, ": publishing...")
+            #print(self.name, ": publishing...")
             self.client.publish(topic, payload=counter, qos=self.qos)
             counter += 1
             sleep(self.delay / 1000)

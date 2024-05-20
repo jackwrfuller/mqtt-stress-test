@@ -2,7 +2,7 @@ from publisher import Publisher
 from analyser import Analyser
 from listener import Listener
 import threading
-from time import time
+from time import time, sleep
 import csv
 
 publisher_threads = list()
@@ -10,14 +10,13 @@ publisher_threads = list()
 
 
 def run():
-    results = open("test.csv", 'w', newline='')
+    results = open("test.csv", 'a', newline='')
     writer = csv.writer(results)
-    fields = ["qos", "delay", "instancecount", "avg_msg", "loss_rate", "out_of_order_rate", "median_gap_1", "median_gap_2", "median_gap_3", "median_gap_4", "median_gap_5", ]
-    writer.writerow(fields)
 
     for qos in range(3):
         for delay in range(5):
             for instancecount in range(1, 6):
+                print(f"starting test {qos}/{delay}/{instancecount}")
                 analyser = Analyser()
                 listener = Listener(writer)
                 launch_publishers(number=5)
@@ -28,7 +27,10 @@ def run():
                 listener.stop()
                 analyser.client.disconnect()
                 listener.client.disconnect()
-                stats = listener.get_stats()
+                sleep(5)
+                listener.get_stats()
+                print(f"ending test {qos}/{delay}/{instancecount}")
+                sleep(5) 
 
     results.close()
     print(f"Listener counted {listener.count}")
@@ -47,7 +49,7 @@ def publisher_loop(number: int):
     client = Publisher(client_name)
     client.subscribe()
     client.publish()
-    client.disconnect()
+    #client.disconnect()
 
 
 def report_stats(results):
